@@ -2,133 +2,11 @@
 > nayra-connect@1.0.0 test:coverage
 > jest --runInBand --detectOpenHandles --coverage
 
-PASS tests/integration/dashboardAndSchedule.test.js
-  ● Console
-
-    console.log
-      ◇ injected env (4) from .env // tip: ⌘ enable debugging { debug: true }
-
-      at _log (node_modules/dotenv/lib/main.js:131:11)
-
-    console.log
-      --- Initializing Nayra Connect Database ---
-
-      at log (db/seed.js:5:11)
-
-    console.log
-      Clearing existing data...
-
-      at log (db/seed.js:9:11)
-
-    console.log
-      Seeding users and roles...
-
-      at log (db/seed.js:18:11)
-
-    console.log
-      Seeded Coordinator: coordinator@nayra.test (ID: 1)
-
-      at log (db/seed.js:28:11)
-
-    console.log
-      Seeded 7 volunteer lawyers.
-
-      at log (db/seed.js:106:11)
-
-    console.log
-      Seeding sample cases across statuses and TAT risk profiles...
-
-      at log (db/seed.js:109:11)
-
-    console.log
-      Seeded 10 sample cases successfully.
-
-      at log (db/seed.js:266:11)
-
-    console.log
-      
-      ======================================================
-
-      at log (db/seed.js:268:11)
-
-    console.log
-             NAYRA CONNECT - SEEDED DEMO CREDENTIALS
-
-      at log (db/seed.js:269:11)
-
-    console.log
-      ======================================================
-
-      at log (db/seed.js:270:11)
-
-    console.log
-      Coordinator:
-
-      at log (db/seed.js:271:11)
-
-    console.log
-        Email: coordinator@nayra.test
-
-      at log (db/seed.js:272:11)
-
-    console.log
-        Password: Coordinator@123
-
-      at log (db/seed.js:273:11)
-
-    console.log
-      
-      Lawyers (Password for all: Lawyer@123):
-
-      at log (db/seed.js:274:11)
-
-    console.log
-        - Adv. Priya Sharma (lawyer1@nayra.test) | Specs: [bail, criminal] | Cap: 4 | Avail: Yes
-
-      at log (db/seed.js:276:13)
-
-    console.log
-        - Adv. Rahul Verma (lawyer2@nayra.test) | Specs: [family, property] | Cap: 5 | Avail: Yes
-
-      at log (db/seed.js:276:13)
-
-    console.log
-        - Adv. Ananya Iyer (lawyer3@nayra.test) | Specs: [labor, consumer] | Cap: 3 | Avail: Yes
-
-      at log (db/seed.js:276:13)
-
-    console.log
-        - Adv. Vikram Malhotra (lawyer4@nayra.test) | Specs: [bail, criminal, property] | Cap: 6 | Avail: Yes
-
-      at log (db/seed.js:276:13)
-
-    console.log
-        - Adv. Sunita Rao (lawyer5@nayra.test) | Specs: [family, labor] | Cap: 4 | Avail: Yes
-
-      at log (db/seed.js:276:13)
-
-    console.log
-        - Adv. Arjun Nair (lawyer6@nayra.test) | Specs: [consumer, bail] | Cap: 5 | Avail: Yes
-
-      at log (db/seed.js:276:13)
-
-    console.log
-        - Adv. Meera Joshi (lawyer7@nayra.test) | Specs: [criminal] | Cap: 2 | Avail: No
-
-      at log (db/seed.js:276:13)
-
-    console.log
-      ======================================================
-
-      at log (db/seed.js:278:11)
-
-PASS tests/unit/riskService.test.js
-PASS tests/unit/scheduler.test.js
 PASS tests/integration/auth.test.js
   ● Console
 
     console.log
-      ◇ injected env (4) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+      ◇ injected env (4) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
 
       at _log (node_modules/dotenv/lib/main.js:131:11)
 
@@ -248,7 +126,7 @@ PASS tests/integration/cases.test.js
   ● Console
 
     console.log
-      ◇ injected env (4) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+      ◇ injected env (4) from .env // tip: ⌘ override existing { override: true }
 
       at _log (node_modules/dotenv/lib/main.js:131:11)
 
@@ -484,7 +362,129 @@ PASS tests/integration/lawyers.test.js
 
       at log (db/seed.js:278:11)
 
+PASS tests/integration/dashboardAndSchedule.test.js
+  ● Console
+
+    console.log
+      ◇ injected env (4) from .env // tip: ⌘ enable debugging { debug: true }
+
+      at _log (node_modules/dotenv/lib/main.js:131:11)
+
+    console.log
+      --- Initializing Nayra Connect Database ---
+
+      at log (db/seed.js:5:11)
+
+    console.log
+      Clearing existing data...
+
+      at log (db/seed.js:9:11)
+
+    console.log
+      Seeding users and roles...
+
+      at log (db/seed.js:18:11)
+
+    console.log
+      Seeded Coordinator: coordinator@nayra.test (ID: 1)
+
+      at log (db/seed.js:28:11)
+
+    console.log
+      Seeded 7 volunteer lawyers.
+
+      at log (db/seed.js:106:11)
+
+    console.log
+      Seeding sample cases across statuses and TAT risk profiles...
+
+      at log (db/seed.js:109:11)
+
+    console.log
+      Seeded 10 sample cases successfully.
+
+      at log (db/seed.js:266:11)
+
+    console.log
+      
+      ======================================================
+
+      at log (db/seed.js:268:11)
+
+    console.log
+             NAYRA CONNECT - SEEDED DEMO CREDENTIALS
+
+      at log (db/seed.js:269:11)
+
+    console.log
+      ======================================================
+
+      at log (db/seed.js:270:11)
+
+    console.log
+      Coordinator:
+
+      at log (db/seed.js:271:11)
+
+    console.log
+        Email: coordinator@nayra.test
+
+      at log (db/seed.js:272:11)
+
+    console.log
+        Password: Coordinator@123
+
+      at log (db/seed.js:273:11)
+
+    console.log
+      
+      Lawyers (Password for all: Lawyer@123):
+
+      at log (db/seed.js:274:11)
+
+    console.log
+        - Adv. Priya Sharma (lawyer1@nayra.test) | Specs: [bail, criminal] | Cap: 4 | Avail: Yes
+
+      at log (db/seed.js:276:13)
+
+    console.log
+        - Adv. Rahul Verma (lawyer2@nayra.test) | Specs: [family, property] | Cap: 5 | Avail: Yes
+
+      at log (db/seed.js:276:13)
+
+    console.log
+        - Adv. Ananya Iyer (lawyer3@nayra.test) | Specs: [labor, consumer] | Cap: 3 | Avail: Yes
+
+      at log (db/seed.js:276:13)
+
+    console.log
+        - Adv. Vikram Malhotra (lawyer4@nayra.test) | Specs: [bail, criminal, property] | Cap: 6 | Avail: Yes
+
+      at log (db/seed.js:276:13)
+
+    console.log
+        - Adv. Sunita Rao (lawyer5@nayra.test) | Specs: [family, labor] | Cap: 4 | Avail: Yes
+
+      at log (db/seed.js:276:13)
+
+    console.log
+        - Adv. Arjun Nair (lawyer6@nayra.test) | Specs: [consumer, bail] | Cap: 5 | Avail: Yes
+
+      at log (db/seed.js:276:13)
+
+    console.log
+        - Adv. Meera Joshi (lawyer7@nayra.test) | Specs: [criminal] | Cap: 2 | Avail: No
+
+      at log (db/seed.js:276:13)
+
+    console.log
+      ======================================================
+
+      at log (db/seed.js:278:11)
+
 PASS tests/unit/allocator.test.js
+PASS tests/unit/riskService.test.js
+PASS tests/unit/scheduler.test.js
 -----------------|---------|----------|---------|---------|------------------------------------------------------------------------------------
 File             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                  
 -----------------|---------|----------|---------|---------|------------------------------------------------------------------------------------
@@ -511,5 +511,5 @@ All files        |   88.67 |    75.39 |   97.36 |   89.13 |
 Test Suites: 7 passed, 7 total
 Tests:       70 passed, 70 total
 Snapshots:   0 total
-Time:        2.783 s, estimated 3 s
+Time:        2.765 s, estimated 3 s
 Ran all test suites.
