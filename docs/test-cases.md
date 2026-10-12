@@ -74,3 +74,4 @@ This document tracks all unit, integration, and boundary test scenarios executed
 | TC-DASH-05 | Dashboard / Schedule | Rejects scheduling consultation on unassigned case | Negative | 400 Bad Request | 400 Bad Request | PASS |
 | TC-DASH-06 | Dashboard / Status | Updates case status to Closed | Positive | 200 OK + status Closed | 200 OK | PASS |
 | TC-DASH-07 | Dashboard / Status | Rejects invalid status transition | Negative | 400 Bad Request | 400 Bad Request | PASS |
+| TC-UI-01 | UI Automation | Selenium WebDriver E2E flow: Coordinator login, walk-in case intake, auto-allocation confirmation, and cases table verification | Positive | Case created and visible with allocated lawyer in cases table | Case #11 (Amal John) auto-allocated to Adv. Arjun Nair and verified in table | PASS |
