@@ -50,3 +50,27 @@ This document tracks all unit, integration, and boundary test scenarios executed
 | TC-LAW-04 | Lawyers API | Non-coordinator rejected from creating lawyer profile | Negative | 403 Forbidden | 403 Forbidden | PASS |
 | TC-LAW-05 | Lawyers API | Rejects creating lawyer with non-positive capacity (capacity <= 0) | Negative | 400 Bad Request | 400 Bad Request | PASS |
 | TC-LAW-06 | Lawyers API | Rejects updating non-existent lawyer ID | Negative | 404 Not Found | 404 Not Found | PASS |
+| TC-RISK-01 | Risk Service | Returns Low risk when ratio < 0.5 | Positive | 'Low' | 'Low' | PASS |
+| TC-RISK-02 | Risk Service | Returns Medium risk when 0.5 <= ratio < 0.8 | Positive | 'Medium' | 'Medium' | PASS |
+| TC-RISK-03 | Risk Service | Returns High risk when ratio >= 0.8 | Positive | 'High' | 'High' | PASS |
+| TC-RISK-04 | Risk Service | Flags isOverdue when daysElapsed >= target_days | Positive | 'High' + isOverdue=true | 'High' + isOverdue=true | PASS |
+| TC-RISK-05 | Risk Service | Ratio exactly at 0.5 boundary is Medium | Boundary | 'Medium' | 'Medium' | PASS |
+| TC-RISK-06 | Risk Service | Ratio exactly at 0.8 boundary is High | Boundary | 'High' | 'High' | PASS |
+| TC-RISK-07 | Risk Service | Newly created case (0 days elapsed) is Low risk | Boundary | 'Low' | 'Low' | PASS |
+| TC-RISK-08 | Risk Service | Closed cases are never at risk | Negative | 'None' + isOverdue=false | 'None' | PASS |
+| TC-RISK-09 | Risk Service | Returns None for null or non-object input | Negative | 'None' | 'None' | PASS |
+| TC-SCHED-01 | Scheduler | Allows booking consultation when slot is clear | Positive | false (no conflict) | false | PASS |
+| TC-SCHED-02 | Scheduler | Allows booking consultation when lawyer has no existing bookings | Positive | false (no conflict) | false | PASS |
+| TC-SCHED-03 | Scheduler | Detects conflict when time is identical to existing slot | Negative | true (conflict) | true | PASS |
+| TC-SCHED-04 | Scheduler | Detects conflict when time is within 15 mins of existing slot | Negative | true (conflict) | true | PASS |
+| TC-SCHED-05 | Scheduler | Detects conflict when time is 20 mins before existing slot | Negative | true (conflict) | true | PASS |
+| TC-SCHED-06 | Scheduler | Slot exactly 30 minutes after previous booking does not conflict | Boundary | false (no conflict) | false | PASS |
+| TC-SCHED-07 | Scheduler | Slot exactly 30 minutes before booking does not conflict | Boundary | false (no conflict) | false | PASS |
+| TC-SCHED-08 | Scheduler | Re-scheduling same case does not conflict with itself | Boundary | false (no conflict) | false | PASS |
+| TC-DASH-01 | Dashboard | Coordinator retrieves summary metrics, load counts, and at-risk cases | Positive | 200 OK + statusCounts, lawyerLoad, atRiskCases | 200 OK | PASS |
+| TC-DASH-02 | Dashboard | Non-coordinator is rejected from dashboard summary | Negative | 403 Forbidden | 403 Forbidden | PASS |
+| TC-DASH-03 | Dashboard / Schedule | Schedules 30-min consultation slot for an allocated case | Positive | 200 OK + status Scheduled | 200 OK | PASS |
+| TC-DASH-04 | Dashboard / Schedule | Rejects conflicting consultation within 30 mins with 409 Conflict | Negative | 409 Conflict | 409 Conflict | PASS |
+| TC-DASH-05 | Dashboard / Schedule | Rejects scheduling consultation on unassigned case | Negative | 400 Bad Request | 400 Bad Request | PASS |
+| TC-DASH-06 | Dashboard / Status | Updates case status to Closed | Positive | 200 OK + status Closed | 200 OK | PASS |
+| TC-DASH-07 | Dashboard / Status | Rejects invalid status transition | Negative | 400 Bad Request | 400 Bad Request | PASS |

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinic Dashboard - Nayra Connect</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 900px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .chart-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .chart-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+
+  <main class="container">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Legal Aid Clinic Dashboard</h1>
+        <p class="page-subtitle">Real-time case allocation metrics, volunteer lawyer workload, and TAT risk monitor.</p>
+      </div>
+      <div>
+        <a href="/intake.html" class="btn btn-primary">+ New Case Intake</a>
+      </div>
+    </div>
+
+    <!-- KPI Summary Row -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Cases</div>
+        <div class="kpi-value" id="kpi-total">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Active / Allocated</div>
+        <div class="kpi-value" id="kpi-active" style="color: var(--primary);">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Unassigned</div>
+        <div class="kpi-value" id="kpi-unassigned" style="color: var(--warning);">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">At-Risk / Overdue TAT</div>
+        <div class="kpi-value" id="kpi-at-risk" style="color: var(--danger);">0</div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-grid">
+      <div class="chart-box">
+        <div class="chart-title">Volunteer Lawyer Workload vs Capacity</div>
+        <div style="position: relative; height: 320px;">
+          <canvas id="lawyer-load-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-box">
+        <div class="chart-title">Case Status Distribution</div>
+        <div style="position: relative; height: 320px;">
+          <canvas id="status-donut-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- At-Risk Cases Table -->
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--danger);">⚠️ At-Risk & Overdue Cases</h2>
+          <p style="color: var(--text-muted); font-size: 0.875rem;">
+            Cases that have reached 80% or more of their target turnaround time (TAT).
+          </p>
+        </div>
+        <a href="/cases.html" class="btn btn-outline btn-sm">View All Cases</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table" id="at-risk-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Client</th>
+              <th>Category</th>
+              <th>Priority</th>
+              <th>Assigned Lawyer</th>
+              <th>Target TAT</th>
+              <th>Elapsed Days</th>
+              <th>TAT Ratio</th>
+              <th>Risk Status</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="at-risk-tbody">
+            <tr>
+              <td colspan="10" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                Loading risk data...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

@@ -4,9 +4,12 @@ const authMiddleware = require('../middleware/auth');
 const { requireRole } = require('../middleware/roles');
 const {
   validateCaseIntake,
+  validateCaseStatus,
   DEFAULT_TARGET_DAYS
 } = require('../middleware/validate');
 const { allocateCase } = require('../services/allocator');
+const { hasScheduleConflict } = require('../services/scheduler');
+const { getRiskAnalysis } = require('../services/riskService');
 
 const router = express.Router();
 
@@ -111,7 +114,12 @@ router.get('/', (req, res) => {
   query += ' ORDER BY c.created_at DESC';
 
   const rows = db.all(query, params);
-  return res.json({ cases: rows });
+  const enrichedRows = rows.map(r => ({
+    ...r,
+    risk: getRiskAnalysis(r)
+  }));
+
+  return res.json({ cases: enrichedRows });
 });
 
 /**
@@ -155,7 +163,12 @@ router.get('/:id', (req, res) => {
     return res.status(403).json({ error: 'Access denied: case is not assigned to you' });
   }
 
-  return res.json({ case: caseItem });
+  return res.json({
+    case: {
+      ...caseItem,
+      risk: getRiskAnalysis(caseItem)
+    }
+  });
 });
 
 /**
@@ -206,7 +219,10 @@ router.post('/', validateCaseIntake, (req, res) => {
       ? `Case allocated to ${matchedLawyer.name}`
       : 'Case created as Unassigned (no eligible lawyer available)',
     allocated: Boolean(matchedLawyer),
-    case: createdCase
+    case: {
+      ...createdCase,
+      risk: getRiskAnalysis(createdCase)
+    }
   });
 });
 
@@ -229,7 +245,6 @@ router.patch('/:id/assign', requireRole('coordinator'), (req, res) => {
   const { lawyer_id } = req.body;
 
   if (lawyer_id === null || lawyer_id === undefined || lawyer_id === '') {
-    // Unassign case
     db.run("UPDATE cases SET lawyer_id = NULL, status = 'Unassigned' WHERE id = ?", [caseId]);
   } else {
     const numLawyerId = parseInt(lawyer_id, 10);
@@ -260,7 +275,123 @@ router.patch('/:id/assign', requireRole('coordinator'), (req, res) => {
     message: updatedCase.lawyer_id
       ? `Case successfully assigned to ${updatedCase.lawyer_name}`
       : 'Case successfully unassigned',
-    case: updatedCase
+    case: {
+      ...updatedCase,
+      risk: getRiskAnalysis(updatedCase)
+    }
+  });
+});
+
+/**
+ * PATCH /api/cases/:id/schedule
+ * Schedules a 30-minute consultation slot, rejecting conflicts with 409
+ */
+router.patch('/:id/schedule', (req, res) => {
+  const caseId = parseInt(req.params.id, 10);
+  if (isNaN(caseId)) {
+    return res.status(400).json({ error: 'Invalid case id' });
+  }
+
+  const db = getDb();
+  const caseItem = db.get('SELECT * FROM cases WHERE id = ?', [caseId]);
+  if (!caseItem) {
+    return res.status(404).json({ error: 'Case not found' });
+  }
+
+  if (req.user.role === 'lawyer' && caseItem.lawyer_id !== req.user.lawyer_id) {
+    return res.status(403).json({ error: 'Access denied: case is not assigned to you' });
+  }
+
+  if (!caseItem.lawyer_id) {
+    return res.status(400).json({ error: 'Cannot schedule consultation for an unassigned case. Assign a lawyer first.' });
+  }
+
+  const { consultation_at } = req.body;
+  if (!consultation_at) {
+    return res.status(400).json({ error: 'consultation_at datetime is required' });
+  }
+
+  const requestedDate = new Date(consultation_at);
+  if (isNaN(requestedDate.getTime())) {
+    return res.status(400).json({ error: 'Invalid consultation_at datetime format' });
+  }
+
+  // Check for existing consultations for this lawyer
+  const existingConsultations = db.all(
+    "SELECT id, consultation_at FROM cases WHERE lawyer_id = ? AND consultation_at IS NOT NULL AND status != 'Closed'",
+    [caseItem.lawyer_id]
+  );
+
+  const isConflict = hasScheduleConflict(existingConsultations, requestedDate, caseId);
+  if (isConflict) {
+    return res.status(409).json({
+      error: 'Consultation slot conflict: this lawyer already has a consultation scheduled within 30 minutes of that time'
+    });
+  }
+
+  const formattedDate = requestedDate.toISOString().replace('T', ' ').substring(0, 19);
+  db.run("UPDATE cases SET consultation_at = ?, status = 'Scheduled' WHERE id = ?", [formattedDate, caseId]);
+
+  const updatedCase = db.get(`
+    SELECT
+      c.*,
+      u.name as lawyer_name,
+      u.email as lawyer_email
+    FROM cases c
+    LEFT JOIN lawyers l ON c.lawyer_id = l.id
+    LEFT JOIN users u ON l.user_id = u.id
+    WHERE c.id = ?
+  `, [caseId]);
+
+  return res.json({
+    message: 'Consultation scheduled successfully',
+    case: {
+      ...updatedCase,
+      risk: getRiskAnalysis(updatedCase)
+    }
+  });
+});
+
+/**
+ * PATCH /api/cases/:id/status
+ * Updates case status (New | Allocated | Unassigned | Scheduled | Closed)
+ */
+router.patch('/:id/status', validateCaseStatus, (req, res) => {
+  const caseId = parseInt(req.params.id, 10);
+  if (isNaN(caseId)) {
+    return res.status(400).json({ error: 'Invalid case id' });
+  }
+
+  const db = getDb();
+  const caseItem = db.get('SELECT * FROM cases WHERE id = ?', [caseId]);
+  if (!caseItem) {
+    return res.status(404).json({ error: 'Case not found' });
+  }
+
+  if (req.user.role === 'lawyer' && caseItem.lawyer_id !== req.user.lawyer_id) {
+    return res.status(403).json({ error: 'Access denied: case is not assigned to you' });
+  }
+
+  const { status } = req.body;
+  db.run('UPDATE cases SET status = ? WHERE id = ?', [status, caseId]);
+
+  const updatedCase = db.get(`
+    SELECT
+      c.*,
+      u.name as lawyer_name,
+      u.email as lawyer_email
+    FROM cases c
+    LEFT JOIN lawyers l ON c.lawyer_id = l.id
+    LEFT JOIN users u ON l.user_id = u.id
+    WHERE c.id = ?
+  `, [caseId]);
+
+  return res.json({
+    message: 'Case status updated successfully',
+    case: {
+      ...updatedCase,
+      risk: getRiskAnalysis(updatedCase)
+    }
   });
 });
 
