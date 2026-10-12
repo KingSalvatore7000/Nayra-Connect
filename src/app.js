@@ -12,7 +12,12 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // Routes
 const authRoutes = require('./routes/auth');
+const lawyersRoutes = require('./routes/lawyers');
+const casesRoutes = require('./routes/cases');
+
 app.use('/api/auth', authRoutes);
+app.use('/api/lawyers', lawyersRoutes);
+app.use('/api/cases', casesRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
