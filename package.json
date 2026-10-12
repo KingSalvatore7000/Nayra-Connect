@@ -1,0 +1,39 @@
+{
+  "name": "nayra-connect",
+  "version": "1.0.0",
+  "description": "Nayra Connect - Legal Aid Clinic Case Allocator",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node db/seed.js",
+    "test": "jest --runInBand --detectOpenHandles",
+    "test:coverage": "jest --runInBand --detectOpenHandles --coverage",
+    "test:ui": "node tests/ui/caseIntake.test.js",
+    "lint": "npx eslint src/services/allocator.js"
+  },
+  "keywords": ["legal-aid", "allocator", "case-management"],
+  "author": "Nayra Connect Team",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.6.2",
+    "dotenv": "^17.3.1",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "jest": "^29.7.0",
+    "selenium-webdriver": "^4.29.0",
+    "supertest": "^7.1.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/server.js"
+    ]
+  }
+}
