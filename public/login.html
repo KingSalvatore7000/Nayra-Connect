@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Nayra Connect</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .auth-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+    }
+    .auth-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 440px;
+      padding: 2.25rem;
+    }
+    .auth-header {
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+    .auth-header .brand-icon {
+      margin: 0 auto 0.75rem auto;
+      width: 48px;
+      height: 48px;
+      font-size: 1.5rem;
+    }
+    .demo-box {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: var(--bg-subtle);
+      border-radius: var(--radius-md);
+      font-size: 0.825rem;
+      border: 1px dashed var(--border);
+    }
+    .demo-btn-group {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .alert-error {
+      background: var(--danger-bg);
+      color: var(--danger-text);
+      border: 1px solid #fecaca;
+      padding: 0.75rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="brand-icon">⚖️</div>
+        <h1 style="font-size:1.5rem; font-weight:700;">Nayra Connect</h1>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-top:0.25rem;">
+          Legal Aid Clinic Case Allocator
+        </p>
+      </div>
+
+      <div id="error-alert" class="alert-error"></div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            class="form-control"
+            placeholder="coordinator@nayra.test"
+            required
+            autocomplete="email"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            class="form-control"
+            placeholder="••••••••••••"
+            required
+            autocomplete="current-password"
+          >
+        </div>
+
+        <button type="submit" id="login-submit-btn" class="btn btn-primary" style="width: 100%; padding: 0.75rem;">
+          Sign In
+        </button>
+      </form>
+
+      <div class="demo-box">
+        <strong>Demo Quick-Fill:</strong>
+        <p style="color:var(--text-muted); margin-top:0.25rem;">
+          Select a role to instantly populate review credentials:
+        </p>
+        <div class="demo-btn-group">
+          <button type="button" class="btn btn-outline btn-sm" onclick="fillCredentials('coordinator@nayra.test', 'Coordinator@123')">
+            Coordinator
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="fillCredentials('lawyer1@nayra.test', 'Lawyer@123')">
+            Lawyer 1 (Priya)
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="fillCredentials('lawyer2@nayra.test', 'Lawyer@123')">
+            Lawyer 2 (Rahul)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/auth.js"></script>
+</body>
+</html>

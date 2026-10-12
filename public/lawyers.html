@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volunteer Lawyers - Nayra Connect</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .lawyer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+    .lawyer-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+
+  <main class="container">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Volunteer Lawyers Roster</h1>
+        <p class="page-subtitle">Manage legal specializations, active workloads, and volunteer availability.</p>
+      </div>
+      <div>
+        <button id="add-lawyer-btn" class="btn btn-primary" onclick="openAddLawyerModal()">
+          + Add Volunteer Lawyer
+        </button>
+      </div>
+    </div>
+
+    <!-- Lawyers Roster Grid -->
+    <div id="lawyers-grid" class="lawyer-grid">
+      <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 3rem;">
+        Loading lawyer roster...
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Lawyer Modal -->
+  <div id="add-lawyer-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeAddLawyerModal()">&times;</button>
+      <h2 class="modal-title">Register Volunteer Lawyer</h2>
+
+      <form id="add-lawyer-form">
+        <div class="form-group">
+          <label class="form-label" for="new-lawyer-name">Full Name *</label>
+          <input type="text" id="new-lawyer-name" class="form-control" placeholder="Adv. Sneha Roy" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="new-lawyer-email">Email Address *</label>
+          <input type="email" id="new-lawyer-email" class="form-control" placeholder="sneha@nayra.test" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="new-lawyer-capacity">Maximum Case Capacity *</label>
+          <input type="number" id="new-lawyer-capacity" class="form-control" value="5" min="1" max="20" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Legal Specializations *</label>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; margin-top:0.4rem;">
+            <label style="font-size:0.875rem;"><input type="checkbox" name="spec" value="bail"> Bail</label>
+            <label style="font-size:0.875rem;"><input type="checkbox" name="spec" value="criminal"> Criminal Defense</label>
+            <label style="font-size:0.875rem;"><input type="checkbox" name="spec" value="family"> Family Law</label>
+            <label style="font-size:0.875rem;"><input type="checkbox" name="spec" value="labor"> Labor / Wages</label>
+            <label style="font-size:0.875rem;"><input type="checkbox" name="spec" value="consumer"> Consumer</label>
+            <label style="font-size:0.875rem;"><input type="checkbox" name="spec" value="property"> Property</label>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1.5rem;">
+          <button type="button" class="btn btn-outline" onclick="closeAddLawyerModal()">Cancel</button>
+          <button type="submit" id="save-lawyer-btn" class="btn btn-primary">Save Lawyer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/lawyers.js"></script>
+</body>
+</html>

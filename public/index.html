@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Nayra Connect - Legal Aid Clinic Case Allocator</title>
+  <script src="/js/common.js"></script>
+  <script>
+    const user = getUser();
+    if (user) {
+      window.location.href = user.role === 'coordinator' ? '/dashboard.html' : '/cases.html';
+    } else {
+      window.location.href = '/login.html';
+    }
+  </script>
+</head>
+<body>
+</body>
+</html>

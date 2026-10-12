@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Case Intake - Nayra Connect</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div id="navbar-container"></div>
+
+  <main class="container">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Walk-In Case Intake</h1>
+        <p class="page-subtitle">Enter client and case details to automatically match an available specialist volunteer lawyer.</p>
+      </div>
+      <div>
+        <a href="/cases.html" class="btn btn-outline">View Cases</a>
+      </div>
+    </div>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+      <form id="intake-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="client_name">Client Full Name *</label>
+            <input type="text" id="client_name" class="form-control" placeholder="e.g. Ramesh Patel" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="phone">Phone Number (10 digits) *</label>
+            <input type="tel" id="phone" class="form-control" placeholder="9876543210" pattern="[0-9]{10}" maxlength="10" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="case_type">Case Category / Type *</label>
+            <select id="case_type" class="form-control" required>
+              <option value="">Select case category</option>
+              <option value="bail">Bail Application (Target TAT: 3 days)</option>
+              <option value="criminal">Criminal Defense (Target TAT: 7 days)</option>
+              <option value="family">Family Dispute / Custody (Target TAT: 14 days)</option>
+              <option value="labor">Labor / Wage Issue (Target TAT: 21 days)</option>
+              <option value="consumer">Consumer Dispute (Target TAT: 21 days)</option>
+              <option value="property">Property / Land Matter (Target TAT: 30 days)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="priority">Urgency Priority *</label>
+            <select id="priority" class="form-control" required>
+              <option value="High">High Urgency</option>
+              <option value="Medium" selected>Medium Urgency</option>
+              <option value="Low">Low Urgency</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="description">Case Summary & Legal Facts (Max 1000 characters) *</label>
+          <textarea id="description" class="form-control" maxlength="1000" rows="4" placeholder="Describe the walk-in client's legal situation, relevant dates, and immediate assistance requested..." required></textarea>
+          <div style="text-align: right; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+            <span id="char-counter">0</span> / 1000 characters
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="reset" class="btn btn-outline">Reset Form</button>
+          <button type="submit" id="submit-intake-btn" class="btn btn-primary">
+            ⚡ Submit & Auto-Allocate
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Immediate Allocation Success Modal -->
+  <div id="allocation-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeAllocationModal()">&times;</button>
+      <div style="text-align: center; margin-bottom: 1.25rem;">
+        <div id="modal-icon" style="font-size: 3rem; margin-bottom: 0.5rem;">⚖️</div>
+        <h2 id="modal-title" class="modal-title">Case Registered</h2>
+        <p id="modal-msg" style="color: var(--text-muted); font-size: 0.9rem;"></p>
+      </div>
+
+      <div id="modal-details" style="background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-md); font-size: 0.875rem; margin-bottom: 1.5rem;">
+        <!-- Dynamic case details inserted via JS -->
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button class="btn btn-outline" onclick="closeAllocationModal()">Add Another Case</button>
+        <a href="/cases.html" class="btn btn-primary">View All Cases</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/intake.js"></script>
+</body>
+</html>
