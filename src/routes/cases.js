@@ -6,11 +6,54 @@ const {
   validateCaseIntake,
   DEFAULT_TARGET_DAYS
 } = require('../middleware/validate');
+const { allocateCase } = require('../services/allocator');
 
 const router = express.Router();
 
 // All case endpoints require authentication
 router.use(authMiddleware);
+
+/**
+ * Loads lawyers with their specializations and current open cases count
+ */
+function loadCandidateLawyers(db) {
+  const lawyers = db.all(`
+    SELECT
+      l.id,
+      l.user_id,
+      u.name,
+      u.email,
+      l.capacity,
+      l.available,
+      COALESCE(
+        (SELECT COUNT(*) FROM cases c WHERE c.lawyer_id = l.id AND c.status != 'Closed'),
+        0
+      ) as openCases
+    FROM lawyers l
+    JOIN users u ON l.user_id = u.id
+    ORDER BY l.id ASC
+  `);
+
+  const specRows = db.all('SELECT lawyer_id, case_type FROM lawyer_specializations');
+  const specMap = {};
+  for (const s of specRows) {
+    if (!specMap[s.lawyer_id]) {
+      specMap[s.lawyer_id] = [];
+    }
+    specMap[s.lawyer_id].push(s.case_type);
+  }
+
+  return lawyers.map(l => ({
+    id: l.id,
+    user_id: l.user_id,
+    name: l.name,
+    email: l.email,
+    capacity: l.capacity,
+    available: Boolean(l.available),
+    openCases: Number(l.openCases),
+    specializations: specMap[l.id] || []
+  }));
+}
 
 /**
  * GET /api/cases
@@ -107,7 +150,7 @@ router.get('/:id', (req, res) => {
     return res.status(404).json({ error: 'Case not found' });
   }
 
-  // Lawyer access restriction: can only view their own assigned cases
+  // Lawyer access restriction
   if (req.user.role === 'lawyer' && caseItem.lawyer_id !== req.user.lawyer_id) {
     return res.status(403).json({ error: 'Access denied: case is not assigned to you' });
   }
@@ -117,7 +160,7 @@ router.get('/:id', (req, res) => {
 
 /**
  * POST /api/cases
- * Case intake endpoint with validation and default target_days calculation
+ * Case intake endpoint with automated case allocation
  */
 router.post('/', validateCaseIntake, (req, res) => {
   const { client_name, phone, case_type, description, priority, target_days } = req.body;
@@ -125,18 +168,99 @@ router.post('/', validateCaseIntake, (req, res) => {
 
   const assignedTargetDays = parseInt(target_days, 10) || DEFAULT_TARGET_DAYS[case_type] || 14;
 
+  // 1. Load active lawyers with openCases count
+  const candidateLawyers = loadCandidateLawyers(db);
+
+  // 2. Pure allocation engine
+  const matchedLawyer = allocateCase({ case_type }, candidateLawyers);
+
+  let initialStatus = 'Unassigned';
+  let assignedLawyerId = null;
+
+  if (matchedLawyer) {
+    initialStatus = 'Allocated';
+    assignedLawyerId = matchedLawyer.id;
+  }
+
+  // 3. Save case to database
   const result = db.run(
     `INSERT INTO cases (client_name, phone, case_type, description, priority, status, lawyer_id, target_days)
-     VALUES (?, ?, ?, ?, ?, 'New', NULL, ?)`,
-    [client_name, phone, case_type, description, priority, assignedTargetDays]
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [client_name, phone, case_type, description, priority, initialStatus, assignedLawyerId, assignedTargetDays]
   );
 
   const newCaseId = result.lastInsertRowid;
-  const createdCase = db.get('SELECT * FROM cases WHERE id = ?', [newCaseId]);
+  const createdCase = db.get(`
+    SELECT
+      c.*,
+      u.name as lawyer_name,
+      u.email as lawyer_email
+    FROM cases c
+    LEFT JOIN lawyers l ON c.lawyer_id = l.id
+    LEFT JOIN users u ON l.user_id = u.id
+    WHERE c.id = ?
+  `, [newCaseId]);
 
   return res.status(201).json({
-    message: 'Case intake submitted successfully',
+    message: matchedLawyer
+      ? `Case allocated to ${matchedLawyer.name}`
+      : 'Case created as Unassigned (no eligible lawyer available)',
+    allocated: Boolean(matchedLawyer),
     case: createdCase
+  });
+});
+
+/**
+ * PATCH /api/cases/:id/assign
+ * Coordinator override endpoint to assign or unassign a lawyer manually
+ */
+router.patch('/:id/assign', requireRole('coordinator'), (req, res) => {
+  const caseId = parseInt(req.params.id, 10);
+  if (isNaN(caseId)) {
+    return res.status(400).json({ error: 'Invalid case id' });
+  }
+
+  const db = getDb();
+  const existingCase = db.get('SELECT * FROM cases WHERE id = ?', [caseId]);
+  if (!existingCase) {
+    return res.status(404).json({ error: 'Case not found' });
+  }
+
+  const { lawyer_id } = req.body;
+
+  if (lawyer_id === null || lawyer_id === undefined || lawyer_id === '') {
+    // Unassign case
+    db.run("UPDATE cases SET lawyer_id = NULL, status = 'Unassigned' WHERE id = ?", [caseId]);
+  } else {
+    const numLawyerId = parseInt(lawyer_id, 10);
+    if (isNaN(numLawyerId)) {
+      return res.status(400).json({ error: 'Invalid lawyer_id' });
+    }
+
+    const lawyer = db.get('SELECT * FROM lawyers WHERE id = ?', [numLawyerId]);
+    if (!lawyer) {
+      return res.status(404).json({ error: 'Lawyer not found' });
+    }
+
+    db.run("UPDATE cases SET lawyer_id = ?, status = 'Allocated' WHERE id = ?", [numLawyerId, caseId]);
+  }
+
+  const updatedCase = db.get(`
+    SELECT
+      c.*,
+      u.name as lawyer_name,
+      u.email as lawyer_email
+    FROM cases c
+    LEFT JOIN lawyers l ON c.lawyer_id = l.id
+    LEFT JOIN users u ON l.user_id = u.id
+    WHERE c.id = ?
+  `, [caseId]);
+
+  return res.json({
+    message: updatedCase.lawyer_id
+      ? `Case successfully assigned to ${updatedCase.lawyer_name}`
+      : 'Case successfully unassigned',
+    case: updatedCase
   });
 });
 
