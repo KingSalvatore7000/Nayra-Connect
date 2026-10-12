@@ -12,6 +12,7 @@ function seedDatabase() {
     DELETE FROM lawyer_specializations;
     DELETE FROM lawyers;
     DELETE FROM users;
+    DELETE FROM sqlite_sequence WHERE name IN ('cases', 'lawyer_specializations', 'lawyers', 'users');
   `);
 
   console.log('Seeding users and roles...');
